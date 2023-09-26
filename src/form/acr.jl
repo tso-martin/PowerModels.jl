@@ -227,13 +227,13 @@ function constraint_storage_losses(pm::AbstractACRModel, n::Int, i, bus, r, x, p
     sd = var(pm, n, :sd, i)
     qsc = var(pm, n, :qsc, i)
 
-    JuMP.@constraint(pm.model,
+    JuMP.@NLconstraint(pm.model,
         sum(ps[c] for c in conductors) + (sd - sc)
         ==
         p_loss + sum(r[c]*(ps[c]^2 + qs[c]^2)/(vr[c]^2 + vi[c]^2) for c in conductors)
     )
 
-    JuMP.@constraint(pm.model,
+    JuMP.@NLconstraint(pm.model,
         sum(qs[c] for c in conductors)
         ==
         qsc + q_loss + sum(x[c]*(ps[c]^2 + qs[c]^2)/(vr[c]^2 + vi[c]^2) for c in conductors)
