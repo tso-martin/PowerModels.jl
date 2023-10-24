@@ -165,6 +165,23 @@ function constraint_ohms_y_oltc_pst_to(pm::AbstractDCPModel, i::Int; nw::Int=nw_
     constraint_ohms_y_pst_to(pm, i; nw=nw)
 end
 
+function constraint_current_from(pm::AbstractDCPModel, i::Int; nw::Int=nw_id_default)
+
+end
+
+function constraint_current_to(pm::AbstractDCPModel, i::Int; nw::Int=nw_id_default)
+
+end
+
+function constraint_current_from_pst(pm::AbstractDCPModel, i::Int; nw::Int=nw_id_default)
+
+end
+
+function constraint_current_to_pst(pm::AbstractDCPModel, i::Int; nw::Int=nw_id_default)
+
+end
+
+
 ""
 function constraint_switch_state_closed(pm::AbstractDCPModel, n::Int, f_bus, t_bus)
     va_fr = var(pm, n, :va, f_bus)

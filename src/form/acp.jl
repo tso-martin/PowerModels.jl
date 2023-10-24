@@ -44,6 +44,212 @@ function constraint_current_limit(pm::AbstractACPModel, n::Int, f_idx, c_rating_
     JuMP.@constraint(pm.model, p_to^2 + q_to^2 <= vm_to^2*c_rating_a^2)
 end
 
+function constraint_current_from(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
+    branch = ref(pm, nw, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    f_idx = (i, f_bus, t_bus)
+    
+    g, b = calc_branch_y(branch)
+    g_fr = branch["g_fr"]
+    b_fr = branch["b_fr"]
+    tm = branch["tap"]
+    @assert tm >= 1.0 "branch $i tap = $tm"
+    ta = branch["shift"]
+
+    cr_fr = var(pm, nw, :cr, f_idx) # real current
+    ci_fr = var(pm, nw, :ci, f_idx) # imaginary current
+    vm_fr = var(pm, nw, :vm, f_bus)
+    vm_to = var(pm, nw, :vm, t_bus)
+    va_fr = var(pm, nw, :va, f_bus)
+    va_to = var(pm, nw, :va, t_bus)
+   
+    JuMP.@NLconstraint(pm.model, cr_fr == vm_fr/tm^2 * (cos(va_fr) * (g + g_fr) - sin(va_fr) * (b + b_fr)) - vm_to/tm * (cos(va_to + ta) * g - sin(va_to + ta) * b))
+    JuMP.@NLconstraint(pm.model, ci_fr == vm_fr/tm^2 * (sin(va_fr) * (g + g_fr) + cos(va_fr) * (b + b_fr)) - vm_to/tm * (sin(va_to + ta) * g + cos(va_to + ta) * b))
+end
+
+function constraint_current_to(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
+    branch = ref(pm, nw, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    t_idx = (i, t_bus, f_bus)
+    
+    g, b = calc_branch_y(branch)
+    g_to = branch["g_to"]
+    b_to = branch["b_to"]
+    tm = branch["tap"]
+    ta = branch["shift"]
+
+    cr_to = var(pm, nw, :cr, t_idx) # real current
+    ci_to = var(pm, nw, :ci, t_idx) # imaginary current
+    vm_fr = var(pm, nw, :vm, f_bus)
+    vm_to = var(pm, nw, :vm, t_bus)
+    va_fr = var(pm, nw, :va, f_bus)
+    va_to = var(pm, nw, :va, t_bus)
+   
+    JuMP.@NLconstraint(pm.model, cr_to == -vm_fr/tm * (cos(va_fr - ta) * g - sin(va_fr - ta) * b) + vm_to * (cos(va_to) * (g + g_to) - sin(va_to) * (b + b_to)))
+    JuMP.@NLconstraint(pm.model, ci_to == -vm_fr/tm * (sin(va_fr - ta) * g + cos(va_fr - ta) * b) + vm_to * (sin(va_to) * (g + g_to) + cos(va_to) * (b + b_to)))
+end
+
+function constraint_current_from_pst(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
+    branch = ref(pm, nw, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    f_idx = (i, f_bus, t_bus)
+    
+    g, b = calc_branch_y(branch)
+    g_fr = branch["g_fr"]
+    b_fr = branch["b_fr"]
+    
+    cr_fr = var(pm, nw, :cr, f_idx) # real current
+    ci_fr = var(pm, nw, :ci, f_idx) # imaginary current
+    vm_fr = var(pm, nw, :vm, f_bus)
+    vm_to = var(pm, nw, :vm, t_bus)
+    va_fr = var(pm, nw, :va, f_bus)
+    va_to = var(pm, nw, :va, t_bus)
+    tm = var(pm, nw, :tm, i)
+    ta = var(pm, nw, :ta, i)
+   
+    JuMP.@NLconstraint(pm.model, cr_fr == vm_fr/tm^2 * (cos(va_fr) * (g + g_fr) - sin(va_fr) * (b + b_fr)) - vm_to/tm * (cos(va_to + ta) * g - sin(va_to + ta) * b))
+    JuMP.@NLconstraint(pm.model, ci_fr == vm_fr/tm^2 * (sin(va_fr) * (g + g_fr) + cos(va_fr) * (b + b_fr)) - vm_to/tm * (sin(va_to + ta) * g + cos(va_to + ta) * b))
+end
+
+function constraint_current_to_pst(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
+    branch = ref(pm, nw, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    t_idx = (i, t_bus, f_bus)
+    
+    g, b = calc_branch_y(branch)
+    g_to = branch["g_to"]
+    b_to = branch["b_to"]
+
+    cr_to = var(pm, nw, :cr, t_idx) # real current
+    ci_to = var(pm, nw, :ci, t_idx) # imaginary current
+    vm_fr = var(pm, nw, :vm, f_bus)
+    vm_to = var(pm, nw, :vm, t_bus)
+    va_fr = var(pm, nw, :va, f_bus)
+    va_to = var(pm, nw, :va, t_bus)
+    tm = var(pm, nw, :tm, i)
+    ta = var(pm, nw, :ta, i)
+
+    JuMP.@NLconstraint(pm.model, cr_to == -vm_fr/tm * (cos(va_fr - ta) * g - sin(va_fr - ta) * b) + vm_to * (cos(va_to) * (g + g_to) - sin(va_to) * (b + b_to)))
+    JuMP.@NLconstraint(pm.model, ci_to == -vm_fr/tm * (sin(va_fr - ta) * g + cos(va_fr - ta) * b) + vm_to * (sin(va_to) * (g + g_to) + cos(va_to) * (b + b_to)))
+end
+
+function expression_current_from(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
+    if !haskey(var(pm, nw), :cr)
+        var(pm, nw)[:cr] = Dict{Tuple{Int,Int,Int},Any}()
+    end
+    if !haskey(var(pm, nw), :ci)
+        var(pm, nw)[:ci] = Dict{Tuple{Int,Int,Int},Any}()
+    end
+
+    branch = ref(pm, nw, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    f_idx = (i, f_bus, t_bus)
+    
+    g, b = calc_branch_y(branch)
+    g_fr = branch["g_fr"]
+    b_fr = branch["b_fr"]
+    tm = branch["tap"]
+    @assert tm >= 1.0 "branch $i tap = $tm"
+    ta = branch["shift"]
+
+    vm_fr = var(pm, nw, :vm, f_bus)
+    vm_to = var(pm, nw, :vm, t_bus)
+    va_fr = var(pm, nw, :va, f_bus)
+    va_to = var(pm, nw, :va, t_bus)
+   
+    var(pm, nw, :cr)[f_idx] = JuMP.@NLexpression(pm.model, vm_fr/tm^2 * (cos(va_fr) * (g + g_fr) - sin(va_fr) * (b + b_fr)) - vm_to/tm * (cos(va_to + ta) * g - sin(va_to + ta) * b))
+    var(pm, nw, :ci)[f_idx] = JuMP.@NLexpression(pm.model, vm_fr/tm^2 * (sin(va_fr) * (g + g_fr) + cos(va_fr) * (b + b_fr)) - vm_to/tm * (sin(va_to + ta) * g + cos(va_to + ta) * b))
+end
+
+function expression_current_to(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
+    if !haskey(var(pm, nw), :cr)
+        var(pm, nw)[:cr] = Dict{Tuple{Int,Int,Int},Any}()
+    end
+    if !haskey(var(pm, nw), :ci)
+        var(pm, nw)[:ci] = Dict{Tuple{Int,Int,Int},Any}()
+    end
+
+    branch = ref(pm, nw, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    t_idx = (i, t_bus, f_bus)
+    
+    g, b = calc_branch_y(branch)
+    g_to = branch["g_to"]
+    b_to = branch["b_to"]
+    tm = branch["tap"]
+    ta = branch["shift"]
+
+    vm_fr = var(pm, nw, :vm, f_bus)
+    vm_to = var(pm, nw, :vm, t_bus)
+    va_fr = var(pm, nw, :va, f_bus)
+    va_to = var(pm, nw, :va, t_bus)
+   
+    var(pm, nw, :cr)[t_idx] = JuMP.@NLexpression(pm.model, -vm_fr/tm * (cos(va_fr - ta) * g - sin(va_fr - ta) * b) + vm_to * (cos(va_to) * (g + g_to) - sin(va_to) * (b + b_to)))
+    var(pm, nw, :ci)[t_idx] = JuMP.@NLexpression(pm.model, -vm_fr/tm * (sin(va_fr - ta) * g + cos(va_fr - ta) * b) + vm_to * (sin(va_to) * (g + g_to) + cos(va_to) * (b + b_to)))
+end
+
+function expression_current_from_pst(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
+    if !haskey(var(pm, nw), :cr)
+        var(pm, nw)[:cr] = Dict{Tuple{Int,Int,Int},Any}()
+    end
+    if !haskey(var(pm, nw), :ci)
+        var(pm, nw)[:ci] = Dict{Tuple{Int,Int,Int},Any}()
+    end
+
+    branch = ref(pm, nw, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    f_idx = (i, f_bus, t_bus)
+    
+    g, b = calc_branch_y(branch)
+    g_fr = branch["g_fr"]
+    b_fr = branch["b_fr"]
+    
+    vm_fr = var(pm, nw, :vm, f_bus)
+    vm_to = var(pm, nw, :vm, t_bus)
+    va_fr = var(pm, nw, :va, f_bus)
+    va_to = var(pm, nw, :va, t_bus)
+    tm = var(pm, nw, :tm, i)
+    ta = var(pm, nw, :ta, i)
+   
+    var(pm, nw, :cr)[f_idx] = JuMP.@NLexpression(pm.model, vm_fr/tm^2 * (cos(va_fr) * (g + g_fr) - sin(va_fr) * (b + b_fr)) - vm_to/tm * (cos(va_to + ta) * g - sin(va_to + ta) * b))
+    var(pm, nw, :ci)[f_idx] = JuMP.@NLexpression(pm.model, vm_fr/tm^2 * (sin(va_fr) * (g + g_fr) + cos(va_fr) * (b + b_fr)) - vm_to/tm * (sin(va_to + ta) * g + cos(va_to + ta) * b))
+end
+
+function expression_current_to_pst(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
+    if !haskey(var(pm, nw), :cr)
+        var(pm, nw)[:cr] = Dict{Tuple{Int,Int,Int},Any}()
+    end
+    if !haskey(var(pm, nw), :ci)
+        var(pm, nw)[:ci] = Dict{Tuple{Int,Int,Int},Any}()
+    end
+
+    branch = ref(pm, nw, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    t_idx = (i, t_bus, f_bus)
+    
+    g, b = calc_branch_y(branch)
+    g_to = branch["g_to"]
+    b_to = branch["b_to"]
+
+    vm_fr = var(pm, nw, :vm, f_bus)
+    vm_to = var(pm, nw, :vm, t_bus)
+    va_fr = var(pm, nw, :va, f_bus)
+    va_to = var(pm, nw, :va, t_bus)
+    tm = var(pm, nw, :tm, i)
+    ta = var(pm, nw, :ta, i)
+
+    var(pm, nw, :cr)[t_idx] = JuMP.@NLexpression(pm.model, -vm_fr/tm * (cos(va_fr - ta) * g - sin(va_fr - ta) * b) + vm_to * (cos(va_to) * (g + g_to) - sin(va_to) * (b + b_to)))
+    var(pm, nw, :ci)[t_idx] = JuMP.@NLexpression(pm.model, -vm_fr/tm * (sin(va_fr - ta) * g + cos(va_fr - ta) * b) + vm_to * (sin(va_to) * (g + g_to) + cos(va_to) * (b + b_to)))
+end
+
 
 ""
 function constraint_power_balance(pm::AbstractACPModel, n::Int, i::Int, bus_arcs, bus_arcs_dc, bus_arcs_sw, bus_gens, bus_storage, bus_pd, bus_qd, bus_gs, bus_bs)
