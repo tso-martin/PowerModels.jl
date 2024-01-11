@@ -487,8 +487,12 @@ function variable_branch_transform_magnitude(pm::AbstractPowerModel; nw::Int=nw_
 
     if bounded
         for (i, branch) in ref(pm, nw, :branch)
-            JuMP.set_lower_bound(tm[i], branch["tm_min"])
-            JuMP.set_upper_bound(tm[i], branch["tm_max"])
+            if branch["tm_min"] == branch["tm_max"]
+                JuMP.fix(tm[i], branch["tm_min"])
+            else
+                JuMP.set_lower_bound(tm[i], branch["tm_min"])
+                JuMP.set_upper_bound(tm[i], branch["tm_max"])
+            end
         end
     end
 
@@ -505,8 +509,12 @@ function variable_branch_transform_angle(pm::AbstractPowerModel; nw::Int=nw_id_d
 
     if bounded
         for (i, branch) in ref(pm, nw, :branch)
-            JuMP.set_lower_bound(ta[i], branch["ta_min"])
-            JuMP.set_upper_bound(ta[i], branch["ta_max"])
+            if branch["ta_min"] == branch["ta_max"]
+                JuMP.fix(ta[i],branch["ta_min"])
+            else
+                JuMP.set_lower_bound(ta[i], branch["ta_min"])
+                JuMP.set_upper_bound(ta[i], branch["ta_max"])
+            end
         end
     end
 
