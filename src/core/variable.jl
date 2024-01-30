@@ -491,7 +491,7 @@ function variable_branch_power_imaginary(pm::AbstractPowerModel; nw::Int=nw_id_d
     report && sol_component_value_edge(pm, nw, :branch, :qf, :qt, ref(pm, nw, :arcs_from), ref(pm, nw, :arcs_to), q)
 end
 
-function variable_branch_transform(pm::AbstractPolarModels; kwargs...)
+function variable_branch_transform(pm::AbstractPowerModel; kwargs...)
     variable_branch_transform_magnitude(pm; kwargs...)
     variable_branch_transform_angle(pm; kwargs...)
 end
@@ -546,6 +546,40 @@ function variable_branch_transform_angle(pm::AbstractPowerModel; nw::Int=nw_id_d
 
     report && sol_component_value(pm, nw, :branch, :ta, ids(pm, nw, :branch), ta)
 end
+
+function variable_branch_transform_angle(pm::AbstractACRModel; nw::Int=nw_id_default, bounded::Bool=true, report::Bool=true)
+    # DEBUG
+    # tr = var(pm, nw)[:tr] = JuMP.@variable(pm.model,
+    #     [i in ids(pm, nw, :branch)], base_name="$(nw)_tr",
+    #     start = comp_start_value(ref(pm, nw, :branch, i), "tr_start")
+    # )
+
+    # ti = var(pm, nw)[:ti] = JuMP.@variable(pm.model,
+    #     [i in ids(pm, nw, :branch)], base_name="$(nw)_ti",
+    #     start = comp_start_value(ref(pm, nw, :branch, i), "ti_start")
+    # )
+
+    # if bounded
+    #     for (i, branch) in ref(pm, nw, :branch)
+    #         if branch["ta_min"] == branch["ta_max"]
+    #             JuMP.fix(tr[i],cos(branch["ta_min"]))
+    #             JuMP.fix(ti[i],sin(branch["ta_min"]))
+    #         else
+    #             ta = JuMP.@expression(pm.model, atan(ti[i]/tr[i]+1e-4))
+    #             if !isinf(branch["ta_min"])
+    #                 JuMP.@constraint(pm.model, ta >= branch["ta_min"])
+    #             end
+    #             if !isinf(branch["ta_max"])
+    #                 JuMP.@constraint(pm.model, ta <= branch["ta_max"])
+    #             end
+    #         end
+    #     end
+    # end
+
+    # report && sol_component_value(pm, nw, :branch, :tr, ids(pm, nw, :branch), tr)
+    # report && sol_component_value(pm, nw, :branch, :ti, ids(pm, nw, :branch), ti)
+end
+
 
 "variable: `cr[l,i,j]` for `(l,i,j)` in `arcs`"
 function variable_branch_current_real(pm::AbstractPowerModel; nw::Int=nw_id_default, bounded::Bool=true, report::Bool=true)

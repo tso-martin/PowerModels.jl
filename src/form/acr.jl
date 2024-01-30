@@ -201,6 +201,28 @@ function constraint_ohms_yt_from(pm::AbstractACRModel, n::Int, f_bus, t_bus, f_i
     JuMP.@constraint(pm.model, q_fr == -(b+b_fr)/tm^2*(vr_fr^2 + vi_fr^2) - (-b*tr-g*ti)/tm^2*(vr_fr*vr_to + vi_fr*vi_to) + (-g*tr+b*ti)/tm^2*(vi_fr*vr_to - vr_fr*vi_to) )
 end
 
+function constraint_ohms_y_oltc_pst_from(pm::ACRPowerModel, i::Int; nw::Int=nw_id_default)
+   # DEBUG
+    constraint_ohms_yt_from(pm, i; nw=nw)
+end
+
+
+# function constraint_ohms_y_oltc_pst_from(pm::AbstractACRModel, n::Int, f_bus, t_bus, f_idx, t_idx, g, b, g_fr, b_fr)    
+#     p_fr = var(pm, n, :p, f_idx)
+#     q_fr = var(pm, n, :q, f_idx)
+#     vr_fr = var(pm, n, :vr, f_bus)
+#     vr_to = var(pm, n, :vr, t_bus)
+#     vi_fr = var(pm, n, :vi, f_bus)
+#     vi_to = var(pm, n, :vi, t_bus)
+#     tm = var(pm, n, :tm, f_idx[1])
+#     ti = var(pm, n, :ti, f_idx[1])
+#     tr = var(pm, n, :tr, f_idx[1])
+    
+
+#     JuMP.@constraint(pm.model, p_fr ==  (g+g_fr)/tm^2*(vr_fr^2 + vi_fr^2) + (-g*tr+b*ti)/tm^2*(vr_fr*vr_to + vi_fr*vi_to) + (-b*tr-g*ti)/tm^2*(vi_fr*vr_to - vr_fr*vi_to) )
+#     JuMP.@constraint(pm.model, q_fr == -(b+b_fr)/tm^2*(vr_fr^2 + vi_fr^2) - (-b*tr-g*ti)/tm^2*(vr_fr*vr_to + vi_fr*vi_to) + (-g*tr+b*ti)/tm^2*(vi_fr*vr_to - vr_fr*vi_to) )
+# end
+
 """
 Creates Ohms constraints (yt post fix indicates that Y and T values are in rectangular form)
 """
@@ -216,6 +238,25 @@ function constraint_ohms_yt_to(pm::AbstractACRModel, n::Int, f_bus, t_bus, f_idx
     JuMP.@constraint(pm.model, q_to == -(b+b_to)*(vr_to^2 + vi_to^2) - (-b*tr+g*ti)/tm^2*(vr_fr*vr_to + vi_fr*vi_to) + (-g*tr-b*ti)/tm^2*(-(vi_fr*vr_to - vr_fr*vi_to)) )
 end
 
+function constraint_ohms_y_oltc_pst_to(pm::ACRPowerModel, i::Int; nw::Int=nw_id_default)
+    # DEBUG
+     constraint_ohms_yt_to(pm, i; nw=nw)
+ end
+
+# function constraint_ohms_y_oltc_pst_to(pm::AbstractACRModel, n::Int, f_bus, t_bus, f_idx, t_idx, g, b, g_to, b_to)    
+#     p_to = var(pm, n, :p, t_idx)
+#     q_to = var(pm, n, :q, t_idx)
+#     vr_fr = var(pm, n, :vr, f_bus)
+#     vr_to = var(pm, n, :vr, t_bus)
+#     vi_fr = var(pm, n, :vi, f_bus)
+#     vi_to = var(pm, n, :vi, t_bus)
+#     tm = var(pm, n, :tm, f_idx[1])
+#     ti = var(pm, n, :ti, f_idx[1])
+#     tr = var(pm, n, :tr, f_idx[1])
+
+#     JuMP.@constraint(pm.model, p_to ==  (g+g_to)*(vr_to^2 + vi_to^2) + (-g*tr-b*ti)/tm^2*(vr_fr*vr_to + vi_fr*vi_to) + (-b*tr+g*ti)/tm^2*(-(vi_fr*vr_to - vr_fr*vi_to)) )
+#     JuMP.@constraint(pm.model, q_to == -(b+b_to)*(vr_to^2 + vi_to^2) - (-b*tr+g*ti)/tm^2*(vr_fr*vr_to + vi_fr*vi_to) + (-g*tr-b*ti)/tm^2*(-(vi_fr*vr_to - vr_fr*vi_to)) )
+# end
 
 ""
 function constraint_storage_losses(pm::AbstractACRModel, n::Int, i, bus, r, x, p_loss, q_loss; conductors=[1])
