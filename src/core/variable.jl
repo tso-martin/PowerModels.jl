@@ -280,8 +280,12 @@ function variable_gen_power_real(pm::AbstractPowerModel; nw::Int=nw_id_default, 
                 warn(_LOGGER, "Generator $i has pmin == pmax == $(gen["pmin"]). Fixing pg to $(gen["pmin"])")
                 JuMP.fix(pg[i], gen["pmin"])
             else
-                JuMP.set_lower_bound(pg[i], gen["pmin"])
-                JuMP.set_upper_bound(pg[i], gen["pmax"])
+                if !isinf(gen["pmin"])
+                    JuMP.set_lower_bound(pg[i], gen["pmin"])
+                end
+                if !isinf(gen["pmax"])
+                    JuMP.set_upper_bound(pg[i], gen["pmax"])
+                end
             end
         end
     end
@@ -302,8 +306,12 @@ function variable_gen_power_imaginary(pm::AbstractPowerModel; nw::Int=nw_id_defa
                 warn(_LOGGER, "Generator $i has qmin == qmax == $(gen["qmin"]). Fixing qg to $(gen["qmin"])")
                 JuMP.fix(qg[i], gen["qmin"])
             else
-                JuMP.set_lower_bound(qg[i], gen["qmin"])
-                JuMP.set_upper_bound(qg[i], gen["qmax"])
+                if !isinf(gen["qmin"])
+                    JuMP.set_lower_bound(qg[i], gen["qmin"])
+                end
+                if !isinf(gen["qmax"])
+                    JuMP.set_upper_bound(qg[i], gen["qmax"])
+                end
             end
         end
     end
@@ -500,8 +508,12 @@ function variable_branch_transform_magnitude(pm::AbstractPowerModel; nw::Int=nw_
             if branch["tm_min"] == branch["tm_max"]
                 JuMP.fix(tm[i], branch["tm_min"])
             else
-                JuMP.set_lower_bound(tm[i], branch["tm_min"])
-                JuMP.set_upper_bound(tm[i], branch["tm_max"])
+                if !isinf(branch["tm_min"])
+                    JuMP.set_lower_bound(tm[i], branch["tm_min"])
+                end
+                if !isinf(branch["tm_max"])
+                    JuMP.set_upper_bound(tm[i], branch["tm_max"])
+                end
             end
         end
     end
@@ -522,8 +534,12 @@ function variable_branch_transform_angle(pm::AbstractPowerModel; nw::Int=nw_id_d
             if branch["ta_min"] == branch["ta_max"]
                 JuMP.fix(ta[i],branch["ta_min"])
             else
-                JuMP.set_lower_bound(ta[i], branch["ta_min"])
-                JuMP.set_upper_bound(ta[i], branch["ta_max"])
+                if !isinf(branch["ta_min"])
+                    JuMP.set_lower_bound(ta[i], branch["ta_min"])
+                end
+                if !isinf(branch["ta_max"])
+                    JuMP.set_upper_bound(ta[i], branch["ta_max"])
+                end
             end
         end
     end
