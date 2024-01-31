@@ -549,35 +549,38 @@ end
 
 function variable_branch_transform_angle(pm::AbstractACRModel; nw::Int=nw_id_default, bounded::Bool=true, report::Bool=true)
     # DEBUG
-    # tr = var(pm, nw)[:tr] = JuMP.@variable(pm.model,
-    #     [i in ids(pm, nw, :branch)], base_name="$(nw)_tr",
-    #     start = comp_start_value(ref(pm, nw, :branch, i), "tr_start")
-    # )
+    tr = var(pm, nw)[:tr] = JuMP.@variable(pm.model,
+        [i in ids(pm, nw, :branch)], base_name="$(nw)_tr",
+        start = comp_start_value(ref(pm, nw, :branch, i), "tr_start"),
+        lower_bound = 0.0
+    )
 
-    # ti = var(pm, nw)[:ti] = JuMP.@variable(pm.model,
-    #     [i in ids(pm, nw, :branch)], base_name="$(nw)_ti",
-    #     start = comp_start_value(ref(pm, nw, :branch, i), "ti_start")
-    # )
+    ti = var(pm, nw)[:ti] = JuMP.@variable(pm.model,
+        [i in ids(pm, nw, :branch)], base_name="$(nw)_ti",
+        start = comp_start_value(ref(pm, nw, :branch, i), "ti_start"),
+        lower_bound = 0.0
+    )
 
+    # DEBUG
     # if bounded
     #     for (i, branch) in ref(pm, nw, :branch)
     #         if branch["ta_min"] == branch["ta_max"]
-    #             JuMP.fix(tr[i],cos(branch["ta_min"]))
-    #             JuMP.fix(ti[i],sin(branch["ta_min"]))
+    #             JuMP.fix(tr[i],cos(branch["ta_min"]),force=true)
+    #             JuMP.fix(ti[i],sin(branch["ta_min"]),force=true)
     #         else
-    #             ta = JuMP.@expression(pm.model, atan(ti[i]/tr[i]+1e-4))
+    #             ta = JuMP.@expression(pm.model, atan(ti[i]/(tr[i]+1e-4)))
     #             if !isinf(branch["ta_min"])
-    #                 JuMP.@constraint(pm.model, ta >= branch["ta_min"])
+    #                 JuMP.@constraint(pm.model, branch["ta_min"] - ta <= 0)
     #             end
     #             if !isinf(branch["ta_max"])
-    #                 JuMP.@constraint(pm.model, ta <= branch["ta_max"])
+    #                 JuMP.@constraint(pm.model, ta - branch["ta_max"]<= 0)
     #             end
     #         end
     #     end
     # end
 
-    # report && sol_component_value(pm, nw, :branch, :tr, ids(pm, nw, :branch), tr)
-    # report && sol_component_value(pm, nw, :branch, :ti, ids(pm, nw, :branch), ti)
+    report && sol_component_value(pm, nw, :branch, :tr, ids(pm, nw, :branch), tr)
+    report && sol_component_value(pm, nw, :branch, :ti, ids(pm, nw, :branch), ti)
 end
 
 
