@@ -68,8 +68,8 @@ function constraint_current_from(pm::AbstractACPModel, i::Int; nw::Int=nw_id_def
     va_fr = var(pm, nw, :va, f_bus)
     va_to = var(pm, nw, :va, t_bus)
    
-    JuMP.@NLconstraint(pm.model, cr_fr == vm_fr/tm^2 * (cos(va_fr) * (g + g_fr) - sin(va_fr) * (b + b_fr)) - vm_to/tm * (cos(va_to + ta) * g - sin(va_to + ta) * b))
-    JuMP.@NLconstraint(pm.model, ci_fr == vm_fr/tm^2 * (sin(va_fr) * (g + g_fr) + cos(va_fr) * (b + b_fr)) - vm_to/tm * (sin(va_to + ta) * g + cos(va_to + ta) * b))
+    JuMP.@constraint(pm.model, cr_fr == vm_fr/tm^2 * (cos(va_fr) * (g + g_fr) - sin(va_fr) * (b + b_fr)) - vm_to/tm * (cos(va_to + ta) * g - sin(va_to + ta) * b))
+    JuMP.@constraint(pm.model, ci_fr == vm_fr/tm^2 * (sin(va_fr) * (g + g_fr) + cos(va_fr) * (b + b_fr)) - vm_to/tm * (sin(va_to + ta) * g + cos(va_to + ta) * b))
 end
 
 function constraint_current_to(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
@@ -91,8 +91,8 @@ function constraint_current_to(pm::AbstractACPModel, i::Int; nw::Int=nw_id_defau
     va_fr = var(pm, nw, :va, f_bus)
     va_to = var(pm, nw, :va, t_bus)
    
-    JuMP.@NLconstraint(pm.model, cr_to == -vm_fr/tm * (cos(va_fr - ta) * g - sin(va_fr - ta) * b) + vm_to * (cos(va_to) * (g + g_to) - sin(va_to) * (b + b_to)))
-    JuMP.@NLconstraint(pm.model, ci_to == -vm_fr/tm * (sin(va_fr - ta) * g + cos(va_fr - ta) * b) + vm_to * (sin(va_to) * (g + g_to) + cos(va_to) * (b + b_to)))
+    JuMP.@constraint(pm.model, cr_to == -vm_fr/tm * (cos(va_fr - ta) * g - sin(va_fr - ta) * b) + vm_to * (cos(va_to) * (g + g_to) - sin(va_to) * (b + b_to)))
+    JuMP.@constraint(pm.model, ci_to == -vm_fr/tm * (sin(va_fr - ta) * g + cos(va_fr - ta) * b) + vm_to * (sin(va_to) * (g + g_to) + cos(va_to) * (b + b_to)))
 end
 
 function constraint_current_from_pst(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
@@ -114,8 +114,8 @@ function constraint_current_from_pst(pm::AbstractACPModel, i::Int; nw::Int=nw_id
     tm = var(pm, nw, :tm, i)
     ta = var(pm, nw, :ta, i)
    
-    JuMP.@NLconstraint(pm.model, cr_fr == vm_fr/tm^2 * (cos(va_fr) * (g + g_fr) - sin(va_fr) * (b + b_fr)) - vm_to/tm * (cos(va_to + ta) * g - sin(va_to + ta) * b))
-    JuMP.@NLconstraint(pm.model, ci_fr == vm_fr/tm^2 * (sin(va_fr) * (g + g_fr) + cos(va_fr) * (b + b_fr)) - vm_to/tm * (sin(va_to + ta) * g + cos(va_to + ta) * b))
+    JuMP.@constraint(pm.model, cr_fr == vm_fr/tm^2 * (cos(va_fr) * (g + g_fr) - sin(va_fr) * (b + b_fr)) - vm_to/tm * (cos(va_to + ta) * g - sin(va_to + ta) * b))
+    JuMP.@constraint(pm.model, ci_fr == vm_fr/tm^2 * (sin(va_fr) * (g + g_fr) + cos(va_fr) * (b + b_fr)) - vm_to/tm * (sin(va_to + ta) * g + cos(va_to + ta) * b))
 end
 
 function constraint_current_to_pst(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
@@ -137,8 +137,8 @@ function constraint_current_to_pst(pm::AbstractACPModel, i::Int; nw::Int=nw_id_d
     tm = var(pm, nw, :tm, i)
     ta = var(pm, nw, :ta, i)
 
-    JuMP.@NLconstraint(pm.model, cr_to == -vm_fr/tm * (cos(va_fr - ta) * g - sin(va_fr - ta) * b) + vm_to * (cos(va_to) * (g + g_to) - sin(va_to) * (b + b_to)))
-    JuMP.@NLconstraint(pm.model, ci_to == -vm_fr/tm * (sin(va_fr - ta) * g + cos(va_fr - ta) * b) + vm_to * (sin(va_to) * (g + g_to) + cos(va_to) * (b + b_to)))
+    JuMP.@constraint(pm.model, cr_to == -vm_fr/tm * (cos(va_fr - ta) * g - sin(va_fr - ta) * b) + vm_to * (cos(va_to) * (g + g_to) - sin(va_to) * (b + b_to)))
+    JuMP.@constraint(pm.model, ci_to == -vm_fr/tm * (sin(va_fr - ta) * g + cos(va_fr - ta) * b) + vm_to * (sin(va_to) * (g + g_to) + cos(va_to) * (b + b_to)))
 end
 
 function expression_current_from(pm::AbstractACPModel, i::Int; nw::Int=nw_id_default)
