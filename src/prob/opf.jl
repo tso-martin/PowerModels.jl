@@ -36,7 +36,7 @@ function build_opf(pm::AbstractPowerModel)
         constraint_ohms_yt_from(pm, i)
         constraint_ohms_yt_to(pm, i)
 
-        constraint_voltage_angle_difference(pm, i)
+        # constraint_voltage_angle_difference(pm, i)
 
         constraint_thermal_limit_from(pm, i)
         constraint_thermal_limit_to(pm, i)
