@@ -277,7 +277,7 @@ function variable_gen_power_real(pm::AbstractPowerModel; nw::Int=nw_id_default, 
     if bounded
         for (i, gen) in ref(pm, nw, :gen)
             if gen["pmin"] == gen["pmax"]
-                warn(_LOGGER, "Generator $i has pmin == pmax == $(gen["pmin"]). Fixing pg to $(gen["pmin"])")
+                @warn "Generator $i has pmin == pmax == $(gen["pmin"]). Fixing pg to $(gen["pmin"])"
                 JuMP.fix(pg[i], gen["pmin"])
             else
                 if !isinf(gen["pmin"])
@@ -303,7 +303,7 @@ function variable_gen_power_imaginary(pm::AbstractPowerModel; nw::Int=nw_id_defa
     if bounded
         for (i, gen) in ref(pm, nw, :gen)
             if gen["qmin"] == gen["qmax"]
-                warn(_LOGGER, "Generator $i has qmin == qmax == $(gen["qmin"]). Fixing qg to $(gen["qmin"])")
+                @warn "Generator $i has qmin == qmax == $(gen["qmin"]). Fixing qg to $(gen["qmin"])"
                 JuMP.fix(qg[i], gen["qmin"])
             else
                 if !isinf(gen["qmin"])
