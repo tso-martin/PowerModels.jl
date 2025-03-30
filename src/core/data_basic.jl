@@ -112,11 +112,12 @@ function make_basic_network!(data::Dict{String,<:Any})
     correct_branch_directions!(data)
 
     # set remaining unsupported components as inactive
-    dcline_status_key = pm_component_status["dcline"]
-    dcline_inactive_status = pm_component_status_inactive["dcline"]
-    for (i,dcline) in data["dcline"]
-        dcline[dcline_status_key] = dcline_inactive_status
-    end
+    # DEBUG 11.02.2025
+    # dcline_status_key = pm_component_status["dcline"]
+    # dcline_inactive_status = pm_component_status_inactive["dcline"]
+    # for (i,dcline) in data["dcline"]
+    #     dcline[dcline_status_key] = dcline_inactive_status
+    # end
 
     # remove inactive components
     for (comp_key, status_key) in pm_component_status

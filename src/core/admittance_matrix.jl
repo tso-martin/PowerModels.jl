@@ -78,12 +78,13 @@ end
 
 "data should be a PowerModels network data model; only supports networks with exactly one refrence bus"
 function calc_susceptance_matrix(data::Dict{String,<:Any})
-    if length(data["dcline"]) > 0
-        Memento.error(_LOGGER, "calc_susceptance_matrix does not support data with dclines")
-    end
-    if length(data["switch"]) > 0
-        Memento.error(_LOGGER, "calc_susceptance_matrix does not support data with switches")
-    end
+    # DEBUG 11.02.2025
+    # if length(data["dcline"]) > 0
+    #     Memento.error(_LOGGER, "calc_susceptance_matrix does not support data with dclines")
+    # end
+    # if length(data["switch"]) > 0
+    #     Memento.error(_LOGGER, "calc_susceptance_matrix does not support data with switches")
+    # end
 
     #TODO check single connected component
 
